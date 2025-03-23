@@ -1,0 +1,97 @@
+from flask import Flask, request, jsonify
+import random
+
+app = Flask(__name__)
+
+# Función para generar IMEI basado en TAC y FAC del original
+def generate_imei_from_base(base_imei):
+    tac = base_imei[:6]
+    fac = base_imei[6:8]
+    unique_part = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+    imei_base = tac + fac + unique_part
+    checksum = (10 - sum((int(x) if i % 2 == 0 else int(x) * 2 if int(x) * 2 < 10 else int(x) * 2 - 9) for i, x in enumerate(imei_base)) % 10) % 10
+    return imei_base + str(checksum)
+
+# Función para verificar si el IMEI es válido usando el algoritmo de Luhn
+def is_valid_imei(imei):
+    imei = imei.replace(" ", "")  # Eliminar espacios
+    if len(imei) != 15 or not imei.isdigit():
+        return False
+    
+    total = 0
+    for i, digit in enumerate(imei):
+        n = int(digit)
+        if i % 2 == 0:
+            total += n
+        else:
+            doubled = n * 2
+            total += doubled - 9 if doubled > 9 else doubled
+    
+    return total % 10 == 0
+
+# Endpoint para recibir el mensaje y generar IMEIs
+@app.route('/generate_imei', methods=['POST'])
+def generate_imei():
+    data = request.form
+    if 'message' not in data:
+        return jsonify({'error': 'Mensaje no recibido'}), 400
+    
+    message = data['message']
+    sender = data.get('sender', 'Usuario Desconocido')
+    phone = data.get('phone', 'Número Desconocido')
+
+    # Si el usuario pide el menú
+    if message.lower() == 'menu':
+        response_message = (
+            "\n💀 *[DC-UNLOCK-X] Menu de Opciones*\n\n"
+            "✅ *Alternativas disponibles:*\n"
+            "1️⃣ **Generar y Verificar IMEI**\n"
+            "- Comando: `f4 [número IMEI]`\n"
+            "- Este comando verifica si un IMEI es válido y genera 5 nuevos IMEIs basados en el IMEI proporcionado.\n"
+            "- **Ejemplo:** `f4 123456789012345`\n\n"
+            "2️⃣ **Check Blacklist (Muy Pronto)**\n"
+            "- Comando: `bl [número IMEI]`\n"
+            "- Verifica si el IMEI está en lista negra (próximamente).\n"
+        )
+        return jsonify({'reply': response_message}), 200
+
+    # Si el usuario usa el comando 'bl'
+    if message.lower().startswith('bl') and len(message.split()) == 2:
+        response_message = "🔍 *Check Blacklist*\n\n⚙️ Esta función estará disponible muy pronto. ¡Mantente atento!"
+        return jsonify({'reply': response_message}), 200
+
+    # Si el mensaje empieza con f4 y tiene el formato adecuado
+    if message.lower().startswith('f4') and len(message.split()) == 2:
+        base_imei = message.split()[1]
+
+        # Verificar si el IMEI es válido
+        if not is_valid_imei(base_imei):
+            response_message = "🚫 *IMEI inválido*.\nPor favor, revisa el IMEI que proporcionaste e intenta nuevamente."
+            return jsonify({'reply': response_message}), 200
+
+        imeis = [generate_imei_from_base(base_imei) for _ in range(5)]
+
+        # Formato de respuesta
+        response_message = (
+            "\n💀 *[DC-UNLOCK-X] IMEI Gen Ready*\n\n"
+            "✅ *Alternativas Generadas:*\n"
+            f"1️⃣ `{imeis[0]}`\n"
+            f"2️⃣ `{imeis[1]}`\n"
+            f"3️⃣ `{imeis[2]}`\n"
+            f"4️⃣ `{imeis[3]}`\n"
+            f"5️⃣ `{imeis[4]}`\n"
+        )
+
+        # Responde en el grupo siempre
+        if 'group_name' in data:
+            return jsonify({'reply': response_message}), 200
+
+        # Si es mensaje privado, envía directamente al remitente
+        else:
+            return jsonify({'reply': f"Hola {sender}, aquí tienes tus IMEIs:\n\n{response_message}"}), 200
+
+    return jsonify({'error': 'Formato incorrecto. Usa: f4 IMEI'}), 400
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000)
+

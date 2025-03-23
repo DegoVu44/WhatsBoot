@@ -1,0 +1,66 @@
+from flask import Flask, request, jsonify
+import random
+import requests
+
+app = Flask(__name__)
+
+# Configuración de API de IMEI Check
+API_KEY = 'TFZLE-zNVoz-R8vcM-gFi0Y-z2Ta6-smhlK'
+SERVICE_ID = '5'
+URL = 'https://alpha.imeicheck.com/api/php-api/create'
+
+# Función para generar IMEI basado en TAC y FAC del original
+def generate_imei_from_base(base_imei):
+    tac = base_imei[:6]
+    fac = base_imei[6:8]
+    unique_part = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+    imei_base = tac + fac + unique_part
+    checksum = (10 - sum((int(x) if i % 2 == 0 else int(x) * 2 if int(x) * 2 < 10 else int(x) * 2 - 9) for i, x in enumerate(imei_base)) % 10) % 10
+    return imei_base + str(checksum)
+
+# Función para verificar IMEI usando la API
+def check_imei(imei):
+    try:
+        response = requests.get(f'{URL}?key={API_KEY}&service={SERVICE_ID}&imei={imei}')
+        response.raise_for_status()
+        data = response.json()
+
+        if 'status' in data and data['status'] == 'success':
+            return data, True
+        else:
+            return data.get('message', 'IMEI no encontrado o error al verificar'), False
+    except requests.exceptions.RequestException as e:
+        return f"Error al verificar el IMEI: {str(e)}", False
+
+# Endpoint principal del bot
+@app.route('/generate_imei', methods=['POST'])
+def generate_imei():
+    data = request.form
+    if 'message' not in data:
+        return jsonify({'error': 'Mensaje no recibido'}), 400
+
+    message = data['message']
+
+    # Comando 'bl' para verificar blacklist
+    if message.lower().startswith('bl') and len(message.split()) == 2:
+        imei = message.split()[1]
+        print(f"Comando 'bl' recibido. IMEI a verificar: {imei}")
+
+        response_data, success = check_imei(imei)
+
+        if success:
+            response_message = (
+                "\n💀 *[Dc Un Check Blacklist Global]*\n\n"
+                "✅ *IMEI Verificado con éxito!*\n"
+                f"📲 Modelo: {response_data.get('model', 'Desconocido')}\n"
+                f"📌 Estado: {response_data.get('status_detail', 'Sin detalles')}\n"
+            )
+            return jsonify({'reply': response_message}), 200
+        else:
+            print(f"Respuesta de la API para 'bl' (error): {response_data}")
+            return jsonify({'reply': "❌ Error al verificar el IMEI. Revisa los detalles en el servidor."}), 200
+
+    return jsonify({'error': 'Formato incorrecto. Usa: bl IMEI'}), 400
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000)
