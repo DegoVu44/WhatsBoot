@@ -15,7 +15,7 @@ def home():
 def keep_alive():
     while True:
         try:
-            requests.get("https://tu-url.com")  # Reemplaza con la URL de tu bot
+            requests.get("https://whatsbot-4uk2.onrender.com/generate_imei")  # Reemplaza con la URL de tu bot
             print("✅ Ping enviado para evitar inactividad")
         except Exception as e:
             print(f"⚠️ Error en el auto-ping: {e}")
