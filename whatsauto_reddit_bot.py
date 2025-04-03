@@ -12,6 +12,7 @@ def home():
 # Configuración de la API de IMEI Check
 API_KEY = 'TFZLE-zNVoz-R8vcM-gFi0Y-z2Ta6-smhlK'  # Reemplaza con tu clave de acceso
 SERVICE_ID = '5'  # ID de servicio que te dieron
+CHECK_SERVICE_ID = '39'  # ID de servicio para el comando 'check'
 URL = 'https://alpha.imeicheck.com/api/php-api/create'  # URL para la API
 
 # Configuración de la API FMI
@@ -104,7 +105,59 @@ def generate_imei_from_base(base_imei):
     random_suffix = ''.join([str(random.randint(0, 9)) for _ in range(7)])
     return base_imei[:8] + random_suffix
 
-# Endpoint para manejar los comandos 'bl', 'f4', 'fmi' y 'menu'
+# Función para obtener los detalles del IMEI usando la API de IMEI Check
+def check_full_imei_details(imei):
+    try:
+        print(f"Consultando IMEI en la API para detalles completos: {imei}")
+        response = requests.get(f'{URL}', params={'key': API_KEY, 'service': CHECK_SERVICE_ID, 'imei': imei})
+        response.raise_for_status()  # Asegura que la petición fue exitosa
+        data = response.json()
+
+        print(f"Respuesta completa de la API: {data}")
+
+        if data and data['status'] == 'success':
+            imei_data = data['object']
+            
+            model_description = imei_data.get('modelDesc', 'Desconocido')
+            model = imei_data.get('model', 'Desconocido')
+            country = imei_data.get('country', 'Desconocido')
+            imei2 = imei_data.get('imei2', 'Desconocido')
+            serial = imei_data.get('serial', 'Desconocido')
+            activated = 'Activado' if imei_data.get('activated', False) else 'No Activado'
+            warranty_status = imei_data.get('warrantyStatus', 'Desconocido')
+            coverage_start_date = imei_data.get('coverageStartDate', 'Desconocido')
+            estimated_purchase_date = imei_data.get('estPurchaseDate', 'Desconocido')
+            applecare_eligible = 'Sí' if not imei_data.get('acEligible', False) else 'No'
+            fmi_status = 'ON' if imei_data.get('fmiOn', False) else 'OFF'
+            blacklist_status = 'Limpio' if not imei_data.get('gsmaBlacklisted', False) else 'En lista negra'
+            carrier = imei_data.get('carrier', 'Desconocido')
+            simlock = 'Desbloqueado' if not imei_data.get('simlock', False) else 'Bloqueado'
+
+            formatted_response = (
+                "\n💀 *[DC-UNLOCK-X] Check Completo IMEI*\n\n"
+                f"✅ *Descripción del Modelo:* {model_description}\n"
+                f"✅ *Modelo:* {model}\n"
+                f"✅ *Región del Modelo:* {country}\n"
+                f"✅ *Número IMEI2:* {imei2}\n"
+                f"✅ *Número de Serie:* {serial}\n"
+                f"✅ *Estado de Activación:* {activated}\n"
+                f"✅ *Estado de Garantía:* {warranty_status}\n"
+                f"✅ *Fecha de Inicio de Cobertura:* {coverage_start_date}\n"
+                f"✅ *Fecha Estimada de Compra:* {estimated_purchase_date}\n"
+                f"✅ *Elegibilidad AppleCare:* {applecare_eligible}\n"
+                f"✅ *Estado FMI:* {fmi_status}\n"
+                f"✅ *Estado de la Lista Negra:* {blacklist_status}\n"
+                f"✅ *Operador:* {carrier}\n"
+                f"✅ *Estado del Sim-Lock:* {simlock}\n"
+            )
+            return formatted_response, True
+        else:
+            return "⚠️ *Error al obtener detalles completos del IMEI.*", False
+    except requests.exceptions.RequestException as e:
+        print(f"Error al consultar el IMEI completo: {e}")
+        return "⚠️ *Error al obtener detalles completos del IMEI.*", False
+
+# Endpoint para manejar los comandos 'bl', 'f4', 'fmi', 'check' y 'menu'
 @app.route('/generate_imei', methods=['POST'])
 def generate_imei():
     data = request.form
@@ -132,6 +185,21 @@ def generate_imei():
         else:
             return jsonify({'reply': response_message}), 200
 
+    # Comando 'check' para obtener los detalles completos del IMEI
+    if message.lower().startswith('check') and len(message.split()) == 2:
+        imei = message.split()[1]
+        print(f"Comando 'check' recibido con IMEI: {imei}")
+        if not is_valid_imei(imei):
+            print(f"IMEI no válido: {imei}")
+            return jsonify({'reply': "❌ *IMEI inválido*. No pasa la verificación Luhn."}), 200
+
+        response_message, success = check_full_imei_details(imei)
+
+        if success:
+            return jsonify({'reply': response_message}), 200
+        else:
+            return jsonify({'reply': response_message}), 200
+
     # Comando 'menu' para mostrar las opciones disponibles
     if message.lower() == 'menu':
         print("Comando 'menu' recibido.")
@@ -149,7 +217,11 @@ def generate_imei():
             "3️⃣ **Buscar mi iPhone Status**\n"
             "- Comando: `fmi [número IMEI]`\n"
             "- Este comando verifica si 'Buscar mi iPhone' está activado o desactivado.\n"
-            "- **Ejemplo:** `fmi 354848091889059`"
+            "- **Ejemplo:** `fmi 354848091889059`\n\n"
+            "4️⃣ **Detalles Completo del IMEI solo Iphone**\n"
+            "- Comando: `check [número IMEI]`\n"
+            "- Este comando obtiene información completa del IMEI.\n"
+            "- **Ejemplo:** `check 123456789012345`"
         )
         return jsonify({'reply': menu_response}), 200
 
@@ -190,7 +262,7 @@ def generate_imei():
         return jsonify({'reply': response_message}), 200
 
     print("Comando no reconocido.")
-    return jsonify({'error': 'Formato incorrecto. Usa: f4 IMEI, bl IMEI o fmi IMEI'}), 400
+    return jsonify({'error': 'Formato incorrecto. Usa: f4 IMEI, bl IMEI, fmi IMEI o check IMEI'}), 400
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))  # Render asigna dinámicamente el puerto
