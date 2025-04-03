@@ -12,19 +12,26 @@ def home():
     return "WhatsAuto Reddit Bot está funcionando correctamente", 200
 
 # Función para evitar inactividad enviando un ping cada 5 minutos
-def keep_alive():
-    bot_url = os.getenv("BOT_URL", "https://whatsbot-4uk2.onrender.com")  # Usar variable de entorno
+def auto_ping():
+    url = "https://whatsbot-4uk2.onrender.com"
+    timeout = 3  # Reducimos el timeout a 3 segundos para evitar bloqueos largos
+    interval = 120  # Hacemos ping cada 2 minutos en lugar de esperar demasiado
+    
     while True:
         try:
-            requests.get(f"{bot_url}/", timeout=5)  # Solo ping a la raíz "/"
-            print("✅ Ping enviado para evitar inactividad")
-        except Exception as e:
+            response = requests.get(url, timeout=timeout)
+            if response.status_code == 200:
+                print("✅ Ping enviado correctamente")
+            else:
+                print(f"⚠️ Ping fallido. Código de estado: {response.status_code}")
+        except requests.exceptions.RequestException as e:
             print(f"⚠️ Error en el auto-ping: {e}")
-        time.sleep(300)  # Espera 5 minutos antes del siguiente ping
+        
+        time.sleep(interval)  # Esperamos el tiempo antes de hacer otro ping
 
-# Iniciar el auto-ping en un hilo separado
-if not os.getenv("RENDER"):
-    threading.Thread(target=keep_alive, daemon=True).start()
+# Ejecutar el auto-ping en un hilo separado
+import threading
+threading.Thread(target=auto_ping, daemon=True).start()
 
 # Configuración de la API de IMEI Check
 API_KEY = 'TFZLE-zNVoz-R8vcM-gFi0Y-z2Ta6-smhlK'  # Reemplaza con tu clave de acceso
