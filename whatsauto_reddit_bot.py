@@ -2,12 +2,27 @@ from flask import Flask, request, jsonify
 import random
 import requests
 import os  # Importante para obtener variables de entorno
+import threading
+import time
 
-app = Flask(__name__)  # Definir app ANTES de los decoradores @app.route
+app = Flask(__name__)  # Definir la app antes de los decoradores @app.route
 
 @app.route("/", methods=["GET"])
 def home():
     return "WhatsAuto Reddit Bot está funcionando correctamente", 200
+
+# Función para evitar inactividad enviando un ping cada 5 minutos
+def keep_alive():
+    while True:
+        try:
+            requests.get("https://tu-url.com")  # Reemplaza con la URL de tu bot
+            print("✅ Ping enviado para evitar inactividad")
+        except Exception as e:
+            print(f"⚠️ Error en el auto-ping: {e}")
+        time.sleep(300)  # Espera 5 minutos antes de enviar otro ping
+
+# Iniciar el auto-ping en un hilo separado
+threading.Thread(target=keep_alive, daemon=True).start()
 
 # Configuración de la API de IMEI Check
 API_KEY = 'TFZLE-zNVoz-R8vcM-gFi0Y-z2Ta6-smhlK'  # Reemplaza con tu clave de acceso
