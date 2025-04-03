@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import random
 import requests
+import os  # Importante para obtener variables de entorno
 
 app = Flask(__name__)
 
