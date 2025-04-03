@@ -23,7 +23,8 @@ def keep_alive():
         time.sleep(300)  # Espera 5 minutos antes del siguiente ping
 
 # Iniciar el auto-ping en un hilo separado
-threading.Thread(target=keep_alive, daemon=True).start()
+if not os.getenv("RENDER"):
+    threading.Thread(target=keep_alive, daemon=True).start()
 
 # Configuración de la API de IMEI Check
 API_KEY = 'TFZLE-zNVoz-R8vcM-gFi0Y-z2Ta6-smhlK'  # Reemplaza con tu clave de acceso
