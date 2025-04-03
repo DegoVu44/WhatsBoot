@@ -2,7 +2,9 @@ from flask import Flask, request, jsonify
 import random
 import requests
 import os  # Importante para obtener variables de entorno
-
+@app.route("/", methods=["GET"])
+def home():
+    return "WhatsAuto Reddit Bot está funcionando correctamente", 200
 app = Flask(__name__)
 
 # Configuración de la API de IMEI Check
