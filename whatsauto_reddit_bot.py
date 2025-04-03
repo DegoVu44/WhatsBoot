@@ -13,13 +13,14 @@ def home():
 
 # Función para evitar inactividad enviando un ping cada 5 minutos
 def keep_alive():
+    bot_url = os.getenv("BOT_URL", "https://whatsbot-4uk2.onrender.com")  # Usar variable de entorno
     while True:
         try:
-            requests.get("https://whatsbot-4uk2.onrender.com/generate_imei")  # Reemplaza con la URL de tu bot
+            requests.get(f"{bot_url}/", timeout=5)  # Solo ping a la raíz "/"
             print("✅ Ping enviado para evitar inactividad")
         except Exception as e:
             print(f"⚠️ Error en el auto-ping: {e}")
-        time.sleep(300)  # Espera 5 minutos antes de enviar otro ping
+        time.sleep(300)  # Espera 5 minutos antes del siguiente ping
 
 # Iniciar el auto-ping en un hilo separado
 threading.Thread(target=keep_alive, daemon=True).start()
