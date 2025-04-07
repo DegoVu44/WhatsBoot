@@ -228,7 +228,7 @@ def generate_imei():
     if message.lower() == 'menu':
         print("Comando 'menu' recibido.")
         menu_response = (
-            "\n💀 *[DC-UNLOCK-X] Menu de Opciones*\n\n"
+            "\n💀 *[True Unlock] Menu de Opciones*\n\n"
             "✅ *Alternativas disponibles:*\n"
             "1️⃣ **Generar y Verificar IMEI**\n"
             "- Comando: `f4 [número IMEI]`\n"
