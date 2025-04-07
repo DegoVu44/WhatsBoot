@@ -228,7 +228,7 @@ def generate_imei():
     if message.lower() == 'menu':
         print("Comando 'menu' recibido.")
         menu_response = (
-            "\n💀 *[True Unlock] Menu de Opciones*\n\n"
+            "\n💀 *[DcUnlock] Menu de Opciones +543525575382*\n\n"
             "✅ *Alternativas disponibles:*\n"
             "1️⃣ **Generar y Verificar IMEI**\n"
             "- Comando: `f4 [número IMEI]`\n"
@@ -245,7 +245,8 @@ def generate_imei():
             "4️⃣ **Detalles Completo del IMEI solo Iphone**\n"
             "- Comando: `check [número IMEI]`\n"
             "- Este comando obtiene información completa del IMEI.\n"
-            "- **Ejemplo:** `check 123456789012345`"
+            "- **Ejemplo:** `check 123456789012345`\n"
+            "\n *ByDegoServ*"
         )
         return jsonify({'reply': menu_response}), 200
 
