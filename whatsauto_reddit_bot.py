@@ -217,7 +217,7 @@ def generate_imei():
         imei = message.split()[1]
         print(f"Comando 'check' recibido con dato: {imei}")
 
-        if is_valid_imei(imei):
+        if imei.isdigit() and is_valid_imei(imei):
             print(f"IMEI válido detectado: {imei}")
         elif is_valid_serial(imei):
             print(f"Serial válido detectado: {imei}")
