@@ -213,7 +213,7 @@ def generate_imei():
             return jsonify({'reply': response_message}), 200
 
 # Comando 'check' para obtener los detalles completos del IMEI o Serial
-if message.lower().startswith('check') and len(message.split()) == 2:
+    if message.lower().startswith('check') and len(message.split()) == 2:
         imei = message.split()[1]
         print(f"Comando 'check' recibido con dato: {imei}")
 
