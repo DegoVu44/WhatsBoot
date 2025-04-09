@@ -259,21 +259,21 @@ def generate_imei():
         return jsonify({'reply': menu_response}), 200
 
     # Comando 'fmi' para verificar el estado de 'Buscar mi iPhone'
-if message.lower().startswith('fmi') and len(message.split()) == 2:
-    dato = message.split()[1]
-    print(f"Comando 'fmi' recibido con dato: {dato}")
-    
-    if dato.isdigit() and is_valid_imei(dato):
-        print(f"IMEI válido detectado: {dato}")
-        response_message, success = check_fmi(dato)
-    elif is_valid_serial(dato):
-        print(f"Serial válido detectado: {dato}")
-        response_message, success = check_fmi(dato)
-    else:
-        print(f"Ni IMEI ni Serial válidos: {dato}")
-        return jsonify({'reply': "❌ *Los datos ingresados no corresponden a un IMEI o Serial válido.*"}), 200
+    if message.lower().startswith('fmi') and len(message.split()) == 2:
+        dato = message.split()[1]
+        print(f"Comando 'fmi' recibido con dato: {dato}")
+        
+        if dato.isdigit() and is_valid_imei(dato):
+            print(f"IMEI válido detectado: {dato}")
+            response_message, success = check_fmi(dato)
+        elif is_valid_serial(dato):
+            print(f"Serial válido detectado: {dato}")
+            response_message, success = check_fmi(dato)
+        else:
+            print(f"Ni IMEI ni Serial válidos: {dato}")
+            return jsonify({'reply': "❌ *Los datos ingresados no corresponden a un IMEI o Serial válido.*"}), 200
 
-    return jsonify({'reply': response_message}), 200
+        return jsonify({'reply': response_message}), 200
 
 
     # Comando 'f4' para generar IMEIs nuevos
