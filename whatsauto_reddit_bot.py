@@ -55,6 +55,9 @@ def is_valid_imei(imei):
                 n -= 9
         total += n
     return total % 10 == 0
+# ✅ Función para validar un número de serie (serial)
+def is_valid_serial(serial):
+    return serial.isalnum() and len(serial) >= 8
 
 # Función para verificar el IMEI en la API de IMEI Check y devolver la respuesta limpia
 def check_imei(imei):
