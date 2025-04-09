@@ -219,18 +219,20 @@ def generate_imei():
 
         if imei.isdigit() and is_valid_imei(imei):
     print(f"IMEI válido detectado: {imei}")
+    response_message, success = check_full_imei_details(imei)
+
 elif is_valid_serial(imei):
     print(f"Serial válido detectado: {imei}")
+    response_message, success = check_full_imei_details(imei)
+
 else:
     print(f"Ni IMEI ni Serial válidos: {imei}")
     return jsonify({'reply': "❌ *Los datos Ingresados no corresponden a una orden valida verifica porfavor.*"}), 200
 
-response_message, success = check_full_imei_details(imei)  # Acá se manda a la API
-
-        if success:
-            return jsonify({'reply': response_message}), 200
-        else:
-            return jsonify({'reply': response_message}), 200
+if success:
+    return jsonify({'reply': response_message}), 200
+else:
+    return jsonify({'reply': response_message}), 200
 
     # Comando 'menu' para mostrar las opciones disponibles
     if message.lower() == 'menu':
