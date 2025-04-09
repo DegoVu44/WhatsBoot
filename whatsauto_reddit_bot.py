@@ -132,12 +132,11 @@ def generate_imei_from_base(base_imei):
     random_suffix = ''.join([str(random.randint(0, 9)) for _ in range(7)])
     return base_imei[:8] + random_suffix
 
-# Función para obtener los detalles del IMEI usando la API de IMEI Check
-def check_full_imei_details(imei):
+def check_full_imei_details(imei_or_serial):
     try:
-        print(f"Consultando IMEI en la API para detalles completos: {imei}")
-        response = requests.get(f'{URL}', params={'key': API_KEY, 'service': CHECK_SERVICE_ID, 'imei': imei})
-        response.raise_for_status()  # Asegura que la petición fue exitosa
+        print(f"Consultando en la API para detalles completos: {imei_or_serial}")
+        response = requests.get(f'{URL}', params={'key': API_KEY, 'service': CHECK_SERVICE_ID, 'imei': imei_or_serial})
+        response.raise_for_status()
         data = response.json()
 
         print(f"Respuesta completa de la API: {data}")
@@ -161,7 +160,7 @@ def check_full_imei_details(imei):
             simlock = 'Desbloqueado' if not imei_data.get('simlock', False) else 'Bloqueado'
 
             formatted_response = (
-                "\n💀 *[DC-UNLOCK-X] Check Completo IMEI*\n\n"
+                "\n💀 *[DC-UNLOCK-X] Check Completo IMEI/Serial*\n\n"
                 f"✅ *Descripción del Modelo:* {model_description}\n"
                 f"✅ *Modelo:* {model}\n"
                 f"✅ *Región del Modelo:* {country}\n"
@@ -179,10 +178,11 @@ def check_full_imei_details(imei):
             )
             return formatted_response, True
         else:
-            return "⚠️ *Error al obtener detalles completos del IMEI.*", False
+            return "⚠️ *Error al obtener detalles completos del IMEI o serial.*", False
     except requests.exceptions.RequestException as e:
-        print(f"Error al consultar el IMEI completo: {e}")
-        return "⚠️ *Error al obtener detalles completos del IMEI.*", False
+        print(f"Error al consultar el IMEI o serial completo: {e}")
+        return "⚠️ *Error al obtener detalles completos del IMEI o serial.*", False
+
 
 # Endpoint para manejar los comandos 'bl', 'f4', 'fmi', 'check' y 'menu'
 @app.route('/generate_imei', methods=['POST'])
