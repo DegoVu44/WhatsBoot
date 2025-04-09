@@ -209,20 +209,25 @@ def generate_imei():
         else:
             return jsonify({'reply': response_message}), 200
 
-    # Comando 'check' para obtener los detalles completos del IMEI
-    if message.lower().startswith('check') and len(message.split()) == 2:
-        imei = message.split()[1]
-        print(f"Comando 'check' recibido con IMEI: {imei}")
-        if not is_valid_imei(imei):
-            print(f"IMEI no válido: {imei}")
-            return jsonify({'reply': "❌ *IMEI inválido*. No pasa la verificación Luhn."}), 200
+   # Comando 'check' para obtener los detalles completos del IMEI o Serial
+if message.lower().startswith('check') and len(message.split()) == 2:
+    imei = message.split()[1]
+    print(f"Comando 'check' recibido con dato: {imei}")
 
-        response_message, success = check_full_imei_details(imei)
+    if is_valid_imei(imei):
+        print(f"IMEI válido detectado: {imei}")
+    elif is_valid_serial(imei):
+        print(f"Serial válido detectado: {imei}")
+    else:
+        print(f"Ni IMEI ni Serial válidos: {imei}")
+        return jsonify({'reply': "❌ *Los datos Ingresados no corresponden a una orden valida verifica porfavor.*"}), 200
 
-        if success:
-            return jsonify({'reply': response_message}), 200
-        else:
-            return jsonify({'reply': response_message}), 200
+    response_message, success = check_full_imei_details(imei)
+
+    if success:
+        return jsonify({'reply': response_message}), 200
+    else:
+        return jsonify({'reply': response_message}), 200
 
     # Comando 'menu' para mostrar las opciones disponibles
     if message.lower() == 'menu':
