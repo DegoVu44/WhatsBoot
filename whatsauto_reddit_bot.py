@@ -86,6 +86,7 @@ def check_imei(imei):
                 f"✅ *Modelo: {model}*\n"
                 f"✅ *Nombre del Modelo: {model_name}*\n"
                 f"✅ *Estado de la lista negra: {blacklist_status}*\n"
+                "\n *ByDegoServ*"
             )
             return formatted_response, True
         else:
@@ -118,6 +119,7 @@ def check_fmi(imei):
                 f"✅ *IMEI: {imei}*\n"
                 f"✅ *Modelo: {model}*\n"
                 f"✅ *Buscar mi iPhone: {fmi_status}*\n"
+                "\n *ByDegoServ*"
             )
             return formatted_response, True
         else:
@@ -175,6 +177,7 @@ def check_full_imei_details(imei_or_serial):
                 f"✅ *Estado de la Lista Negra:* {blacklist_status}\n"
                 f"✅ *Operador:* {carrier}\n"
                 f"✅ *Estado del Sim-Lock:* {simlock}\n"
+                "\n *ByDegoServ*"
             )
             return formatted_response, True
         else:
@@ -236,7 +239,8 @@ def generate_imei():
     if message.lower() == 'menu':
         print("Comando 'menu' recibido.")
         menu_response = (
-            "\n💀 *[DcUnlock] Menu de Opciones +543525575382*\n\n"
+            "\n💀 *[DcUnlock] Menu de Opciones *\n\n"
+            "✅ *EL BOT SE PUEDE ALQUILAR SOLO CONTACTANOS GRUPO O PRIVADO +543525575382 *\n"
             "✅ *Alternativas disponibles:*\n"
             "1️⃣ **Generar y Verificar IMEI**\n"
             "- Comando: `f4 [número IMEI]`\n"
@@ -246,13 +250,13 @@ def generate_imei():
             "- Comando: `bl [número IMEI]`\n"
             "- Este comando verifica si el IMEI está en la lista negra de la base de datos.\n"
             "- **Ejemplo:** `bl 123456789012345`\n\n"
-            "3️⃣ **Buscar mi iPhone Status**\n"
-            "- Comando: `fmi [número IMEI]`\n"
-            "- Este comando verifica si 'Buscar mi iPhone' está activado o desactivado.\n"
+            "3️⃣ **Fmi activado/desactivado IMEI/SN**\n"
+            "- Comando: `fmi [número IMEI/SN]`\n"
+            "- Este comando verifica si 'FMI' está activado o desactivado.\n"
             "- **Ejemplo:** `fmi 354848091889059`\n\n"
-            "4️⃣ **Detalles Completo del IMEI solo Iphone**\n"
-            "- Comando: `check [número IMEI]`\n"
-            "- Este comando obtiene información completa del IMEI.\n"
+            "4️⃣ **Check Completo **\n"
+            "- Comando: `check [número IMEI/SN]`\n"
+            "- Este comando obtiene información completa del IMEI/SN.\n"
             "- **Ejemplo:** `check 123456789012345`\n"
             "\n *ByDegoServ*"
         )
@@ -293,6 +297,7 @@ def generate_imei():
             f"3️⃣ `{imeis[2]}`\n"
             f"4️⃣ `{imeis[3]}`\n"
             f"5️⃣ `{imeis[4]}`\n"
+            "\n *ByDegoServ*"
         )
 
         return jsonify({'reply': response_message}), 200
