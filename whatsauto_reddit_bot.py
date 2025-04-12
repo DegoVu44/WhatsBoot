@@ -86,7 +86,7 @@ def check_imei(imei):
                 f"✅ *Modelo: {model}*\n"
                 f"✅ *Nombre del Modelo: {model_name}*\n"
                 f"✅ *Estado de la lista negra: {blacklist_status}*\n"
-                f"*Gracias {sender}*"\n"
+                f"💀 *Gracias {sender}*\n"
                 "\n *ByDegoServ*"
                 
             )
