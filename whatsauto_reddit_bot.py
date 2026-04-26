@@ -240,8 +240,7 @@ def generate_imei():
     if message.lower() == 'menu':
         print("Comando 'menu' recibido.")
         menu_response = (
-            "\n💀 *[DcUnlock] Menu de Opciones*\n\n"
-"📲 *Alquiler / Consultas:* +54 352 557 5382\n\n"
+            "\n💀 *MGSM OPCIONES CHECK*\n\n"
 "✅ *Alternativas disponibles:*\n"
 "1️⃣ *Generar y Verificar IMEI*\n"
 "- Comando: `f4 [IMEI]`\n"
